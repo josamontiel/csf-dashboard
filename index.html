@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MDE Deployment Tracker · NIST CSF 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root[data-theme="dark"] {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2230;
+    --bg-card-hover: #21293a;
+    --bg-input: #0d1117;
+    --border: #30363d;
+    --border-subtle: #21293a;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --accent: #0078D4;
+    --accent-light: #1a9fe6;
+    --accent-glow: rgba(0,120,212,0.18);
+    --accent-subtle: rgba(0,120,212,0.08);
+    --gov-color: #7c3aed;
+    --gov-bg: rgba(124,58,237,0.1);
+    --id-color: #0ea5e9;
+    --id-bg: rgba(14,165,233,0.1);
+    --pr-color: #10b981;
+    --pr-bg: rgba(16,185,129,0.1);
+    --de-color: #f59e0b;
+    --de-bg: rgba(245,158,11,0.1);
+    --rs-color: #ef4444;
+    --rs-bg: rgba(239,68,68,0.1);
+    --rc-color: #06b6d4;
+    --rc-bg: rgba(6,182,212,0.1);
+    --status-complete: #10b981;
+    --status-progress: #f59e0b;
+    --status-blocked: #ef4444;
+    --status-pending: #484f58;
+    --priority-high: #ef4444;
+    --priority-med: #f59e0b;
+    --priority-low: #10b981;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+    --scrollbar-bg: #1c2230;
+    --scrollbar-thumb: #30363d;
+  }
+  :root[data-theme="light"] {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #e2e8f0;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f7fafc;
+    --bg-input: #f8fafc;
+    --border: #cbd5e1;
+    --border-subtle: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --accent: #0078D4;
+    --accent-light: #1a9fe6;
+    --accent-glow: rgba(0,120,212,0.12);
+    --accent-subtle: rgba(0,120,212,0.06);
+    --gov-color: #7c3aed;
+    --gov-bg: rgba(124,58,237,0.07);
+    --id-color: #0284c7;
+    --id-bg: rgba(2,132,199,0.07);
+    --pr-color: #059669;
+    --pr-bg: rgba(5,150,105,0.07);
+    --de-color: #d97706;
+    --de-bg: rgba(217,119,6,0.07);
+    --rs-color: #dc2626;
+    --rs-bg: rgba(220,38,38,0.07);
+    --rc-color: #0891b2;
+    --rc-bg: rgba(8,145,178,0.07);
+    --status-complete: #059669;
+    --status-progress: #d97706;
+    --status-blocked: #dc2626;
+    --status-pending: #94a3b8;
+    --priority-high: #dc2626;
+    --priority-med: #d97706;
+    --priority-low: #059669;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+    --scrollbar-bg: #e2e8f0;
+    --scrollbar-thumb: #94a3b8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+  .header-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 28px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .logo-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--bg-card-hover); color: var(--text-primary); border-color: var(--accent); }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-accent:hover { background: var(--accent-light); color: #fff; border-color: var(--accent-light); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .theme-toggle {
+    width: 34px; height: 34px;
+    padding: 0;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .badge-mssp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--accent-subtle);
+    color: var(--accent);
+    border: 1px solid var(--accent-glow);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px 28px 60px;
+  }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .ov-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: all 0.2s;
+  }
+  .ov-card:hover { border-color: var(--accent); background: var(--bg-card-hover); }
+  .ov-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .ov-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .ov-sub {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .ov-bar {
+    margin-top: 10px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .ov-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── SECTION TABS ── */
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .tab {
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab:hover { background: var(--bg-card); color: var(--text-primary); }
+  .tab.active {
+    background: var(--bg-card);
+    border-color: var(--border);
+    color: var(--text-primary);
+  }
+  .tab-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tab-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--bg-primary);
+    color: var(--text-muted);
+  }
+
+  /* ── FUNCTION SECTIONS ── */
+  .function-section { display: none; }
+  .function-section.active { display: block; }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 18px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+  }
+  .section-header-left { flex: 1; }
+  .fn-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .fn-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .fn-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    max-width: 640px;
+    line-height: 1.5;
+  }
+  .section-progress {
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .progress-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .progress-pct {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .progress-pct-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── TASKS TABLE ── */
+  .tasks-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .task-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 24px 1fr auto auto auto;
+    gap: 12px;
+    align-items: start;
+    transition: all 0.18s;
+    position: relative;
+    overflow: hidden;
+  }
+  .task-row::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    background: var(--fn-color, var(--border));
+    opacity: 0.7;
+  }
+  .task-row:hover { background: var(--bg-card-hover); border-color: var(--accent); }
+  .task-row.complete { opacity: 0.7; }
+  .task-row.complete .task-name { text-decoration: line-through; color: var(--text-muted); }
+
+  .task-check {
+    width: 18px; height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent);
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .task-body { min-width: 0; }
+  .task-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+    transition: color 0.18s;
+  }
+  .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .task-nist {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    background: var(--bg-primary);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .task-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  .task-status-sel {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.18s;
+    min-width: 120px;
+  }
+  .task-status-sel:focus { border-color: var(--accent); }
+  .task-status-sel.s-complete { color: var(--status-complete); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06); }
+  .task-status-sel.s-progress { color: var(--status-progress); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.06); }
+  .task-status-sel.s-blocked { color: var(--status-blocked); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
+  .task-status-sel.s-pending { color: var(--text-muted); }
+
+  .priority-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .p-high { color: var(--priority-high); background: rgba(239,68,68,0.1); }
+  .p-med { color: var(--priority-med); background: rgba(245,158,11,0.1); }
+  .p-low { color: var(--priority-low); background: rgba(16,185,129,0.1); }
+
+  .task-notes-col {
+    min-width: 200px;
+    max-width: 280px;
+  }
+  .task-notes {
+    width: 100%;
+    padding: 5px 9px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    resize: vertical;
+    min-height: 36px;
+    outline: none;
+    transition: border-color 0.18s;
+    line-height: 1.4;
+  }
+  .task-notes:focus { border-color: var(--accent); }
+  .task-notes::placeholder { color: var(--text-muted); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    max-width: 560px;
+    width: 90%;
+    box-shadow: var(--shadow);
+    animation: modal-in 0.2s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes modal-in {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-body { margin-bottom: 20px; }
+  .modal-body pre {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-secondary);
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* ── EXPORT OPTIONS ── */
+  .export-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .export-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.18s;
+  }
+  .export-card:hover { border-color: var(--accent); background: var(--accent-subtle); }
+  .export-card-icon { font-size: 22px; margin-bottom: 8px; }
+  .export-card-label { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+  .export-card-desc { font-size: 10px; color: var(--text-muted); }
+
+  /* ── NOTIFICATIONS ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    z-index: 300;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .main-wrap { padding: 16px 14px 40px; }
+    .task-row { grid-template-columns: 24px 1fr; }
+    .task-status-sel, .priority-badge, .task-notes-col { display: none; }
+    .export-grid { grid-template-columns: 1fr; }
+    .header-inner { padding: 0 14px; }
+    .badge-mssp { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <div>
+        <div class="logo-text">MDE · NIST CSF 2.0</div>
+        <div class="logo-sub">Deployment Tracker</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="badge-mssp">MSSP · Microsoft Security</span>
+      <button class="btn btn-sm" onclick="openExportModal()">⬆ Export</button>
+      <button class="btn btn-sm btn-accent" onclick="openJsonModal()">{ } Config JSON</button>
+      <button class="btn theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- OVERVIEW -->
+  <div class="overview-grid" id="overviewGrid">
+    <div class="ov-card">
+      <div class="ov-label">Total Tasks</div>
+      <div class="ov-value" id="ov-total">0</div>
+      <div class="ov-sub">Across all CSF functions</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">Completed</div>
+      <div class="ov-value" id="ov-complete" style="color:var(--status-complete)">0</div>
+      <div class="ov-sub">Tasks finished</div>
+      <div class="ov-bar"><div class="ov-bar-fill" id="ov-bar-complete" style="background:var(--status-complete);width:0%"></div></div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">In Progress</div>
+      <div class="ov-value" id="ov-progress" style="color:var(--status-progress)">0</div>
+      <div class="ov-sub">Currently active</div>
+      <div class="ov-bar"><div class="ov-bar-fill" id="ov-bar-progress" style="background:var(--status-progress);width:0%"></div></div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">Blocked</div>
+      <div class="ov-value" id="ov-blocked" style="color:var(--status-blocked)">0</div>
+      <div class="ov-sub">Awaiting resolution</div>
+      <div class="ov-bar"><div class="ov-bar-fill" id="ov-bar-blocked" style="background:var(--status-blocked);width:0%"></div></div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">Overall Progress</div>
+      <div class="ov-value" id="ov-pct" style="color:var(--accent)">0%</div>
+      <div class="ov-sub">Deployment complete</div>
+      <div class="ov-bar"><div class="ov-bar-fill" id="ov-bar-pct" style="width:0%"></div></div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">High Priority</div>
+      <div class="ov-value" id="ov-hipri" style="color:var(--priority-high)">0</div>
+      <div class="ov-sub">Pending high-pri tasks</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">CSF Functions</div>
+      <div class="ov-value" id="ov-funcs" style="color:var(--accent)">6</div>
+      <div class="ov-sub">NIST CSF 2.0 mapped</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-row" id="tabsRow"></div>
+
+  <!-- FUNCTION SECTIONS -->
+  <div id="sectionsContainer"></div>
+
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-title">⬆ Export Dashboard</div>
+    <div class="modal-body">
+      <div class="export-grid">
+        <div class="export-card" onclick="exportCSV()">
+          <div class="export-card-icon">📄</div>
+          <div class="export-card-label">CSV</div>
+          <div class="export-card-desc">All tasks with status & notes</div>
+        </div>
+        <div class="export-card" onclick="exportHTML()">
+          <div class="export-card-icon">🌐</div>
+          <div class="export-card-label">HTML Report</div>
+          <div class="export-card-desc">Printable deployment report</div>
+        </div>
+        <div class="export-card" onclick="exportJSON()">
+          <div class="export-card-icon">{ }</div>
+          <div class="export-card-label">JSON Config</div>
+          <div class="export-card-desc">Full config with all data</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('exportModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- JSON MODAL -->
+<div class="modal-overlay" id="jsonModal">
+  <div class="modal">
+    <div class="modal-title">{ } Configuration JSON Preview</div>
+    <div class="modal-body">
+      <pre id="jsonPreview"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="copyJSON()">📋 Copy</button>
+      <button class="btn btn-accent" onclick="exportJSON()">⬇ Download</button>
+      <button class="btn" onclick="closeModal('jsonModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA — NIST CSF 2.0 × MDE TASK DEFINITIONS
+// ─────────────────────────────────────────────
+const FUNCTIONS = [
+  {
+    id: 'GV',
+    name: 'GOVERN',
+    color: 'var(--gov-color)',
+    bg: 'var(--gov-bg)',
+    emoji: '⚙️',
+    desc: 'Establish and monitor your organization\'s cybersecurity risk management strategy, expectations, and policy — aligned with MDE licensing, RBAC, and governance controls.',
+    tasks: [
+      { id:'GV-01', name:'Assign & Validate MDE P1/P2 Licenses', nist:'GV.OC-01', priority:'high', desc:'Confirm E5/M365 Defender for Endpoint Plan 2 licenses are assigned to all in-scope users/devices via M365 Admin Center.' },
+      { id:'GV-02', name:'Define Roles — Security Admin & Reader RBAC', nist:'GV.OC-02', priority:'high', desc:'Assign Security Administrator and Security Reader roles in Microsoft Entra ID for SOC team members using least privilege.' },
+      { id:'GV-03', name:'Configure Custom Roles in MDE RBAC', nist:'GV.OC-02', priority:'med', desc:'Create custom RBAC roles in Defender portal > Settings > Permissions > Roles to segment analyst access by device group.' },
+      { id:'GV-04', name:'Establish Device Groups & Tag Strategy', nist:'GV.OC-03', priority:'high', desc:'Define device groups (e.g., Servers, Workstations, VIP) in Defender portal for scoped policy and investigation access.' },
+      { id:'GV-05', name:'Document MDE Governance Policy', nist:'GV.PO-01', priority:'med', desc:'Create internal policy document covering MDE scope, RBAC, alert handling, and escalation procedures.' },
+      { id:'GV-06', name:'Review Microsoft Secure Score Baseline', nist:'GV.RM-01', priority:'med', desc:'Capture initial Secure Score from Defender portal as risk baseline. Document current posture pre-deployment.' },
+      { id:'GV-07', name:'Enable Tenant-Level MDE Settings', nist:'GV.OC-01', priority:'high', desc:'Review and configure tenant-level settings: EDR in block mode, deception capabilities, share endpoint alerts, SIEM integration toggle.' },
+      { id:'GV-08', name:'Configure Notification & Alert Emails', nist:'GV.OC-05', priority:'low', desc:'Set up alert email notifications for security operations team in Defender portal > Settings > Email Notifications.' },
+    ]
+  },
+  {
+    id: 'ID',
+    name: 'IDENTIFY',
+    color: 'var(--id-color)',
+    bg: 'var(--id-bg)',
+    emoji: '🔍',
+    desc: 'Develop organizational understanding of assets, vulnerabilities, and risks. MDE provides rich device inventory, software discovery, and TVM for continuous risk identification.',
+    tasks: [
+      { id:'ID-01', name:'Onboard Windows 10/11 Devices via GPO', nist:'ID.AM-01', priority:'high', desc:'Deploy MDE onboarding package to Windows endpoints via Group Policy Object. Verify sensor connectivity in Defender portal.' },
+      { id:'ID-02', name:'Onboard Windows Server 2016/2019/2022', nist:'ID.AM-01', priority:'high', desc:'Deploy MDE package on Windows Servers. For 2012 R2/2016 use modern unified agent. Verify AV-MDE coexistence settings.' },
+      { id:'ID-03', name:'Onboard Linux Servers (MDATP)', nist:'ID.AM-01', priority:'high', desc:'Deploy Microsoft Defender for Endpoint on Linux using mdatp CLI or Ansible/Chef automation. Configure exclusions for high-I/O processes.' },
+      { id:'ID-04', name:'Onboard macOS Devices', nist:'ID.AM-01', priority:'med', desc:'Deploy MDE on macOS via Intune, JAMF Pro, or manual package. Grant required system extensions and Full Disk Access via MDM profile.' },
+      { id:'ID-05', name:'Configure Device Inventory View', nist:'ID.AM-01', priority:'med', desc:'Review device inventory in Defender portal > Assets > Devices. Set up custom columns, filters by OS and risk level.' },
+      { id:'ID-06', name:'Enable Threat & Vulnerability Management (TVM)', nist:'ID.RA-01', priority:'high', desc:'Activate TVM in Defender portal. Review exposure score, security recommendations, and software inventory. Configure discovery scan schedules.' },
+      { id:'ID-07', name:'Configure Network Device Discovery', nist:'ID.AM-03', priority:'med', desc:'Enable network discovery in MDE to map unmanaged devices and IoT. Configure discovery device (probe) and scanning schedule.' },
+      { id:'ID-08', name:'Enable Software Inventory & EOS Tracking', nist:'ID.AM-02', priority:'med', desc:'Review software inventory for end-of-support (EOS) products in TVM. Set up alerts for newly discovered vulnerable software.' },
+      { id:'ID-09', name:'Tag Devices by Criticality / Business Unit', nist:'ID.AM-04', priority:'low', desc:'Apply device tags via MDE API, registry, or Intune policy to label asset criticality (Critical, High, Medium) and business owner.' },
+      { id:'ID-10', name:'Integrate with Microsoft Entra Device Compliance', nist:'ID.AM-04', priority:'med', desc:'Connect MDE device risk signal to Intune/Entra Conditional Access for device compliance scoring.' },
+    ]
+  },
+  {
+    id: 'PR',
+    name: 'PROTECT',
+    color: 'var(--pr-color)',
+    bg: 'var(--pr-bg)',
+    emoji: '🔒',
+    desc: 'Develop and implement safeguards to ensure delivery of critical services. MDE\'s preventive controls — ASR, NGAV, device control, and network protection — are configured here.',
+    tasks: [
+      { id:'PR-01', name:'Configure Next-Gen Antivirus (NGAV) Policy', nist:'PR.PS-01', priority:'high', desc:'Set cloud-delivered protection to "High" and real-time protection enabled. Configure PUA protection, MAPS, and automatic sample submission via Intune/GPO.' },
+      { id:'PR-02', name:'Enable Attack Surface Reduction (ASR) Rules — Audit', nist:'PR.PS-01', priority:'high', desc:'Deploy all ASR rules in Audit mode first. Review rule hits in MDE > Reports > ASR for 2 weeks before enforcement.' },
+      { id:'PR-03', name:'Promote Critical ASR Rules to Block Mode', nist:'PR.PS-01', priority:'high', desc:'Move high-confidence rules to Block: Block Office macros, Block credential stealing from LSASS, Block abuse of exploited vulnerable signed drivers.' },
+      { id:'PR-04', name:'Enable Network Protection', nist:'PR.AA-05', priority:'high', desc:'Set Network Protection to Enabled (Block) mode via Intune/GPO. Validates web threat categories, phishing, and C2 indicators at the kernel level.' },
+      { id:'PR-05', name:'Configure Web Content Filtering (WCF)', nist:'PR.AA-05', priority:'med', desc:'Create web content filtering policy in Defender portal. Block Adult, Gambling, Malicious categories. Assign policy to device groups.' },
+      { id:'PR-06', name:'Configure Device Control (USB/Removable Media)', nist:'PR.DS-01', priority:'med', desc:'Deploy device control policy to block or audit unauthorized USB/removable storage. Define allow-lists for approved device IDs.' },
+      { id:'PR-07', name:'Enable Controlled Folder Access (CFA)', nist:'PR.DS-01', priority:'med', desc:'Enable CFA to protect against ransomware. Deploy in Audit mode, identify legitimate apps blocked, then enforce.' },
+      { id:'PR-08', name:'Configure Firewall via Defender for Endpoint', nist:'PR.PS-02', priority:'med', desc:'Enforce Windows Defender Firewall policy via Intune/GPO. Baseline: block inbound, allow outbound. Audit firewall event logging.' },
+      { id:'PR-09', name:'Set Tamper Protection (Defender Anti-Tampering)', nist:'PR.PS-01', priority:'high', desc:'Enable Tamper Protection via Intune Security Baselines or Defender portal (tenant-level). Prevents attackers disabling AV/EDR.' },
+      { id:'PR-10', name:'Configure Security Baselines (Intune)', nist:'PR.PS-02', priority:'high', desc:'Deploy Microsoft Security Baseline for Windows 10/11, Edge, and Defender for Endpoint via Intune compliance policies.' },
+      { id:'PR-11', name:'Enable BitLocker via Endpoint Security', nist:'PR.DS-02', priority:'med', desc:'Configure BitLocker policy via Intune Endpoint Security > Disk Encryption. Enforce XTS-AES 256 for OS and data drives.' },
+      { id:'PR-12', name:'Conditional Access — Device Compliance Integration', nist:'PR.AA-03', priority:'high', desc:'Configure Entra Conditional Access policies requiring MDE device risk level "Low" or "Medium" for resource access.' },
+    ]
+  },
+  {
+    id: 'DE',
+    name: 'DETECT',
+    color: 'var(--de-color)',
+    bg: 'var(--de-bg)',
+    emoji: '📡',
+    desc: 'Develop and implement activities to identify the occurrence of a cybersecurity event. MDE\'s EDR, Advanced Hunting, behavioral analytics, and SIEM integration power detection.',
+    tasks: [
+      { id:'DE-01', name:'Validate EDR Sensor Connectivity', nist:'DE.CM-01', priority:'high', desc:'Confirm all onboarded devices report "Active" in Defender portal. Set up automated alert for devices "Inactive" > 7 days.' },
+      { id:'DE-02', name:'Configure Alert Severity Policies', nist:'DE.AE-02', priority:'high', desc:'Review and tune default alert severity mappings in Defender portal. Suppress known false positives per device group.' },
+      { id:'DE-03', name:'Enable EDR in Block Mode', nist:'DE.CM-01', priority:'high', desc:'Enable EDR in Block mode for devices with non-Microsoft AV as primary. Blocks malicious artifacts based on EDR behavioral detections.' },
+      { id:'DE-04', name:'Configure Advanced Hunting — Custom Detections', nist:'DE.CM-06', priority:'high', desc:'Create custom detection rules in Advanced Hunting (KQL) for environment-specific threats. Schedule minimum hourly runs.' },
+      { id:'DE-05', name:'Integrate MDE with Microsoft Sentinel', nist:'DE.CM-09', priority:'high', desc:'Connect MDE to Microsoft Sentinel via Data Connector. Enable Microsoft Defender XDR connector. Configure analytics rules and UEBA.' },
+      { id:'DE-06', name:'Configure Behavioral Anomaly Alerts', nist:'DE.AE-04', priority:'med', desc:'Enable Microsoft Defender XDR Deception capability for lateral movement detection. Review identity-based behavioral analytics alerts.' },
+      { id:'DE-07', name:'Set Up Threat Analytics Monitoring', nist:'DE.AE-02', priority:'med', desc:'Subscribe to Threat Analytics reports in Defender portal. Configure email digests for analyst-level threat intelligence briefings.' },
+      { id:'DE-08', name:'Create Vulnerability Alert Rules (TVM)', nist:'DE.CM-07', priority:'med', desc:'Set up TVM-based alerts for critical CVEs (CVSS 9.0+) and exposed devices. Route via Sentinel or email notification.' },
+      { id:'DE-09', name:'Configure Deception (Fake Credentials/Honeytokens)', nist:'DE.CM-06', priority:'low', desc:'Enable Defender Deception technology (MDE + Defender for Identity integration) to detect credential theft and lateral movement.' },
+      { id:'DE-10', name:'Establish Baseline Detection Metrics (KPIs)', nist:'DE.AE-07', priority:'med', desc:'Define detection KPIs: MTTD, alert volume by severity, false positive rate. Export to Power BI or Sentinel Workbook.' },
+    ]
+  },
+  {
+    id: 'RS',
+    name: 'RESPOND',
+    color: 'var(--rs-color)',
+    bg: 'var(--rs-bg)',
+    emoji: '⚡',
+    desc: 'Develop and implement activities to take action regarding detected cybersecurity events. MDE\'s AIR, Live Response, and incident management capabilities are core response tools.',
+    tasks: [
+      { id:'RS-01', name:'Configure Automated Investigation & Remediation (AIR)', nist:'RS.MA-04', priority:'high', desc:'Set AIR automation level to "Full — remediate threats automatically" for low-risk device groups. Use "Semi-auto" for critical servers.' },
+      { id:'RS-02', name:'Enable Live Response Capabilities', nist:'RS.MA-02', priority:'high', desc:'Enable Live Response in Defender settings. Deploy Live Response library with approved remediation scripts. Restrict to Security Admin role.' },
+      { id:'RS-03', name:'Configure Device Isolation Policy', nist:'RS.MA-01', priority:'high', desc:'Document and test device isolation (Full/Selective) workflow. Define approval process for isolation of production servers.' },
+      { id:'RS-04', name:'Set Up Incident Notification & Escalation', nist:'RS.CO-02', priority:'high', desc:'Configure incident-level email notifications. Define escalation matrix: L1 analyst → L2 → SOC Manager → CISO for Critical incidents.' },
+      { id:'RS-05', name:'Integrate Ticketing System (ServiceNow/Jira)', nist:'RS.CO-03', priority:'med', desc:'Configure Defender XDR to auto-create tickets in ITSM via Logic App or Power Automate connector on High/Critical incidents.' },
+      { id:'RS-06', name:'Create Response Playbooks (KQL + AIR)', nist:'RS.MA-05', priority:'med', desc:'Document and test response playbooks for top 5 threat scenarios: ransomware, credential theft, lateral movement, phishing, supply chain.' },
+      { id:'RS-07', name:'Test Simulated Attack Scenarios (Attack Simulator)', nist:'RS.MA-03', priority:'med', desc:'Run simulated attack scenarios via Microsoft Defender Attack Simulator (Credential Harvest, Malware Attachment, Drive-by URL).' },
+      { id:'RS-08', name:'Configure Power Automate Response Flows', nist:'RS.MA-04', priority:'low', desc:'Build automated response flows: isolate device on Critical alert, block IOC, notify SOC Slack/Teams channel via Power Automate.' },
+    ]
+  },
+  {
+    id: 'RC',
+    name: 'RECOVER',
+    color: 'var(--rc-color)',
+    bg: 'var(--rc-bg)',
+    emoji: '🔄',
+    desc: 'Develop and implement activities to maintain plans for resilience and restore impaired capabilities. MDE\'s remediation, post-incident analysis, and posture recovery workflows.',
+    tasks: [
+      { id:'RC-01', name:'Define Device Remediation & Release Workflow', nist:'RC.RP-01', priority:'high', desc:'Document formal process for reviewing investigation evidence, approving remediation actions, and releasing isolated devices with sign-off chain.' },
+      { id:'RC-02', name:'Configure Remediation Action Center Review', nist:'RC.RP-02', priority:'high', desc:'Establish regular (daily) review of the Action Center for pending remediation actions. Define approval SLA: 4 hours for Critical, 24 for High.' },
+      { id:'RC-03', name:'Post-Incident Review Process', nist:'RC.CO-04', priority:'med', desc:'Create a post-incident review template covering: root cause, timeline, containment, indicators, Secure Score impact, control gaps.' },
+      { id:'RC-04', name:'Defender Secure Score Improvement Plan', nist:'RC.IM-02', priority:'med', desc:'Review Secure Score recommendations in Defender portal monthly. Assign remediation tasks to device owners with target dates.' },
+      { id:'RC-05', name:'Configure Threat Analytics Recovery Guidance', nist:'RC.CO-03', priority:'low', desc:'Review Threat Analytics reports for active threats with recommended mitigations. Track mitigation completion percentage per threat report.' },
+      { id:'RC-06', name:'Quarterly MDE Deployment Health Review', nist:'RC.IM-01', priority:'med', desc:'Conduct quarterly review: device coverage %, sensor health, alert trend, policy compliance rate, TVM exposure score trend.' },
+      { id:'RC-07', name:'Enable Microsoft Defender Experts (if licensed)', nist:'RC.CO-02', priority:'low', desc:'If MDE Expert tier licensed, configure Microsoft Defender Experts for Hunting or XDR managed service as third-tier escalation path.' },
+    ]
+  }
+];
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+let state = {};
+
+function initState() {
+  const saved = localStorage.getItem('mde-tracker-state');
+  if (saved) {
+    try { state = JSON.parse(saved); return; } catch(e) {}
+  }
+  FUNCTIONS.forEach(fn => {
+    fn.tasks.forEach(t => {
+      state[t.id] = { status: 'pending', notes: '' };
+    });
+  });
+}
+
+function saveState() {
+  localStorage.setItem('mde-tracker-state', JSON.stringify(state));
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+function render() {
+  renderTabs();
+  renderSections();
+  updateOverview();
+}
+
+function renderTabs() {
+  const container = document.getElementById('tabsRow');
+  const allComplete = FUNCTIONS.reduce((sum, fn) => {
+    const total = fn.tasks.length;
+    const done = fn.tasks.filter(t => state[t.id]?.status === 'complete').length;
+    return sum + (total === done ? 1 : 0);
+  }, 0);
+
+  let html = `<button class="tab active" data-tab="all" onclick="switchTab('all', this)">
+    <span>All Functions</span>
+    <span class="tab-count">${FUNCTIONS.reduce((s,f)=>s+f.tasks.length,0)}</span>
+  </button>`;
+
+  FUNCTIONS.forEach(fn => {
+    const done = fn.tasks.filter(t => state[t.id]?.status === 'complete').length;
+    html += `<button class="tab" data-tab="${fn.id}" onclick="switchTab('${fn.id}', this)">
+      <span class="tab-dot" style="background:${fn.color}"></span>
+      <span>${fn.id} · ${fn.name}</span>
+      <span class="tab-count">${done}/${fn.tasks.length}</span>
+    </button>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderSections() {
+  const container = document.getElementById('sectionsContainer');
+  let html = '';
+
+  // ALL tab section
+  html += `<div class="function-section active" id="section-all">`;
+  FUNCTIONS.forEach(fn => {
+    html += renderFunctionBlock(fn);
+  });
+  html += `</div>`;
+
+  // Individual tabs
+  FUNCTIONS.forEach(fn => {
+    html += `<div class="function-section" id="section-${fn.id}">`;
+    html += renderFunctionBlock(fn);
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderFunctionBlock(fn) {
+  const total = fn.tasks.length;
+  const done = fn.tasks.filter(t => state[t.id]?.status === 'complete').length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  let html = `<div style="--fn-color:${fn.color}">
+    <div class="section-header">
+      <div class="section-header-left">
+        <div class="fn-tag" style="color:${fn.color};background:${fn.bg}">${fn.emoji} ${fn.id} · ${fn.name}</div>
+        <div class="fn-title">${fn.name.charAt(0)+fn.name.slice(1).toLowerCase()}</div>
+        <div class="fn-desc">${fn.desc}</div>
+      </div>
+      <div class="section-progress">
+        <div class="progress-ring-wrap">
+          <div class="progress-pct" style="color:${fn.color}">${pct}%</div>
+          <div class="progress-pct-label">${done} of ${total} done</div>
+        </div>
+      </div>
+    </div>
+    <div class="tasks-grid">`;
+
+  fn.tasks.forEach(t => {
+    const s = state[t.id] || { status: 'pending', notes: '' };
+    const isComplete = s.status === 'complete';
+    html += `<div class="task-row${isComplete?' complete':''}" id="row-${t.id}" style="--fn-color:${fn.color}">
+      <input type="checkbox" class="task-check" ${isComplete?'checked':''} onchange="toggleComplete('${t.id}', this)"/>
+      <div class="task-body">
+        <div class="task-name">${t.name}</div>
+        <div class="task-meta">
+          <span class="task-nist">${t.nist}</span>
+          <span class="priority-badge p-${t.priority}">${t.priority}</span>
+        </div>
+        <div class="task-desc">${t.desc}</div>
+      </div>
+      <select class="task-status-sel s-${s.status}" onchange="updateStatus('${t.id}', this)">
+        <option value="pending" ${s.status==='pending'?'selected':''}>⬜ Not Started</option>
+        <option value="progress" ${s.status==='progress'?'selected':''}>🟡 In Progress</option>
+        <option value="complete" ${s.status==='complete'?'selected':''}>✅ Complete</option>
+        <option value="blocked" ${s.status==='blocked'?'selected':''}>🔴 Blocked</option>
+      </select>
+      <span class="priority-badge p-${t.priority}" style="align-self:start">${t.priority.toUpperCase()}</span>
+      <div class="task-notes-col">
+        <textarea class="task-notes" rows="2" placeholder="Add notes…" oninput="updateNotes('${t.id}', this)">${s.notes||''}</textarea>
+      </div>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+  return html;
+}
+
+function updateOverview() {
+  const allTasks = FUNCTIONS.flatMap(fn => fn.tasks);
+  const total = allTasks.length;
+  const complete = allTasks.filter(t => state[t.id]?.status === 'complete').length;
+  const progress = allTasks.filter(t => state[t.id]?.status === 'progress').length;
+  const blocked = allTasks.filter(t => state[t.id]?.status === 'blocked').length;
+  const pct = total ? Math.round(complete/total*100) : 0;
+  const hiPri = allTasks.filter(t => t.priority==='high' && state[t.id]?.status !== 'complete').length;
+
+  document.getElementById('ov-total').textContent = total;
+  document.getElementById('ov-complete').textContent = complete;
+  document.getElementById('ov-progress').textContent = progress;
+  document.getElementById('ov-blocked').textContent = blocked;
+  document.getElementById('ov-pct').textContent = pct + '%';
+  document.getElementById('ov-hipri').textContent = hiPri;
+
+  document.getElementById('ov-bar-complete').style.width = (complete/total*100) + '%';
+  document.getElementById('ov-bar-progress').style.width = (progress/total*100) + '%';
+  document.getElementById('ov-bar-blocked').style.width = (blocked/total*100) + '%';
+  document.getElementById('ov-bar-pct').style.width = pct + '%';
+}
+
+// ─────────────────────────────────────────────
+//  INTERACTIONS
+// ─────────────────────────────────────────────
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.function-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+}
+
+function toggleComplete(id, el) {
+  const status = el.checked ? 'complete' : 'pending';
+  state[id] = state[id] || {};
+  state[id].status = status;
+  saveState();
+  // Update select + row
+  const row = document.getElementById('row-' + id);
+  if (row) {
+    row.classList.toggle('complete', status === 'complete');
+    const sel = row.querySelector('.task-status-sel');
+    if (sel) { sel.value = status; updateSelectStyle(sel, status); }
+  }
+  updateOverview();
+  updateAllTabCounts();
+}
+
+function updateStatus(id, sel) {
+  const status = sel.value;
+  state[id] = state[id] || {};
+  state[id].status = status;
+  saveState();
+  updateSelectStyle(sel, status);
+  const row = document.getElementById('row-' + id);
+  if (row) {
+    row.classList.toggle('complete', status === 'complete');
+    const cb = row.querySelector('.task-check');
+    if (cb) cb.checked = status === 'complete';
+  }
+  updateOverview();
+  updateAllTabCounts();
+}
+
+function updateSelectStyle(sel, status) {
+  sel.className = 'task-status-sel s-' + status;
+}
+
+function updateNotes(id, el) {
+  state[id] = state[id] || {};
+  state[id].notes = el.value;
+  saveState();
+}
+
+function updateAllTabCounts() {
+  FUNCTIONS.forEach(fn => {
+    const done = fn.tasks.filter(t => state[t.id]?.status === 'complete').length;
+    const tab = document.querySelector(`[data-tab="${fn.id}"] .tab-count`);
+    if (tab) tab.textContent = `${done}/${fn.tasks.length}`;
+  });
+}
+
+// ─────────────────────────────────────────────
+//  THEME
+// ─────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+  localStorage.setItem('mde-theme', isDark ? 'light' : 'dark');
+}
+
+function initTheme() {
+  const saved = localStorage.getItem('mde-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').textContent = saved === 'dark' ? '🌙' : '☀️';
+}
+
+// ─────────────────────────────────────────────
+//  EXPORT
+// ─────────────────────────────────────────────
+function buildExportData() {
+  return {
+    meta: {
+      tool: 'MDE NIST CSF 2.0 Deployment Tracker',
+      version: '1.0',
+      exported: new Date().toISOString(),
+      framework: 'NIST CSF 2.0',
+      platform: 'Microsoft Defender for Endpoint'
+    },
+    summary: (() => {
+      const all = FUNCTIONS.flatMap(f=>f.tasks);
+      const total = all.length;
+      const complete = all.filter(t=>state[t.id]?.status==='complete').length;
+      const progress = all.filter(t=>state[t.id]?.status==='progress').length;
+      const blocked = all.filter(t=>state[t.id]?.status==='blocked').length;
+      return { total, complete, progress, blocked, pending: total-complete-progress-blocked, overallPct: Math.round(complete/total*100) };
+    })(),
+    functions: FUNCTIONS.map(fn => ({
+      id: fn.id,
+      name: fn.name,
+      tasks: fn.tasks.map(t => ({
+        id: t.id,
+        name: t.name,
+        nistSubcategory: t.nist,
+        priority: t.priority,
+        description: t.desc,
+        status: state[t.id]?.status || 'pending',
+        notes: state[t.id]?.notes || ''
+      }))
+    }))
+  };
+}
+
+function exportJSON() {
+  const data = buildExportData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mde-nist-csf-config.json'; a.click();
+  URL.revokeObjectURL(url);
+  closeModal('exportModal'); closeModal('jsonModal');
+  showToast('✅ JSON config downloaded');
+}
+
+function exportCSV() {
+  const rows = [['Function','Task ID','Task Name','NIST Subcategory','Priority','Status','Notes']];
+  FUNCTIONS.forEach(fn => {
+    fn.tasks.forEach(t => {
+      const s = state[t.id] || {};
+      rows.push([fn.name, t.id, `"${t.name}"`, t.nist, t.priority, s.status||'pending', `"${(s.notes||'').replace(/"/g,'""')}"`]);
+    });
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mde-nist-deployment.csv'; a.click();
+  URL.revokeObjectURL(url);
+  closeModal('exportModal');
+  showToast('✅ CSV exported');
+}
+
+function exportHTML() {
+  const data = buildExportData();
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const bgColor = isDark ? '#0d1117' : '#f0f4f8';
+  const textColor = isDark ? '#e6edf3' : '#0f172a';
+  const cardBg = isDark ? '#1c2230' : '#ffffff';
+  const borderColor = isDark ? '#30363d' : '#cbd5e1';
+  const accentColor = '#0078D4';
+
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>MDE NIST CSF 2.0 Deployment Report</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:${bgColor};color:${textColor};margin:0;padding:32px;}
+    h1{font-size:22px;margin-bottom:4px;color:${accentColor};}
+    .meta{font-size:12px;opacity:0.6;margin-bottom:24px;}
+    .summary{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:28px;}
+    .sum-card{background:${cardBg};border:1px solid ${borderColor};border-radius:8px;padding:16px;min-width:120px;}
+    .sum-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.5;margin-bottom:6px;}
+    .sum-val{font-size:22px;font-weight:700;}
+    table{width:100%;border-collapse:collapse;margin-bottom:32px;background:${cardBg};border:1px solid ${borderColor};border-radius:8px;overflow:hidden;}
+    th{text-align:left;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:0.7px;opacity:0.6;border-bottom:1px solid ${borderColor};}
+    td{padding:10px 14px;font-size:12px;border-bottom:1px solid ${borderColor};vertical-align:top;}
+    tr:last-child td{border-bottom:none;}
+    .fn-header{background:${accentColor};color:#fff;padding:12px 14px;font-weight:700;font-size:14px;}
+    .s-complete{color:#10b981;font-weight:600;}
+    .s-progress{color:#f59e0b;font-weight:600;}
+    .s-blocked{color:#ef4444;font-weight:600;}
+    .s-pending{opacity:0.5;}
+    .p-high{color:#ef4444;font-weight:700;}
+    .p-med{color:#f59e0b;font-weight:700;}
+    .p-low{color:#10b981;font-weight:700;}
+  </style></head><body>
+  <h1>🛡️ MDE · NIST CSF 2.0 Deployment Report</h1>
+  <div class="meta">Generated: ${new Date().toLocaleString()} | Framework: NIST CSF 2.0 | Platform: Microsoft Defender for Endpoint</div>
+  <div class="summary">
+    <div class="sum-card"><div class="sum-label">Total</div><div class="sum-val">${data.summary.total}</div></div>
+    <div class="sum-card"><div class="sum-label">Complete</div><div class="sum-val" style="color:#10b981">${data.summary.complete}</div></div>
+    <div class="sum-card"><div class="sum-label">In Progress</div><div class="sum-val" style="color:#f59e0b">${data.summary.progress}</div></div>
+    <div class="sum-card"><div class="sum-label">Blocked</div><div class="sum-val" style="color:#ef4444">${data.summary.blocked}</div></div>
+    <div class="sum-card"><div class="sum-label">Progress</div><div class="sum-val" style="color:${accentColor}">${data.summary.overallPct}%</div></div>
+  </div>`;
+
+  data.functions.forEach(fn => {
+    html += `<table><tr><td colspan="5" class="fn-header">${fn.id} · ${fn.name}</td></tr>
+    <tr><th>Task</th><th>NIST</th><th>Priority</th><th>Status</th><th>Notes</th></tr>`;
+    fn.tasks.forEach(t => {
+      html += `<tr>
+        <td><strong>${t.name}</strong><br/><small style="opacity:0.6">${t.description}</small></td>
+        <td><code>${t.nistSubcategory}</code></td>
+        <td class="p-${t.priority}">${t.priority.toUpperCase()}</td>
+        <td class="s-${t.status}">${t.status.charAt(0).toUpperCase()+t.status.slice(1)}</td>
+        <td>${t.notes||'—'}</td>
+      </tr>`;
+    });
+    html += `</table>`;
+  });
+
+  html += `</body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mde-nist-report.html'; a.click();
+  URL.revokeObjectURL(url);
+  closeModal('exportModal');
+  showToast('✅ HTML report exported');
+}
+
+// ─────────────────────────────────────────────
+//  MODALS
+// ─────────────────────────────────────────────
+function openExportModal() {
+  document.getElementById('exportModal').classList.add('open');
+}
+function openJsonModal() {
+  const data = buildExportData();
+  document.getElementById('jsonPreview').textContent = JSON.stringify(data, null, 2);
+  document.getElementById('jsonModal').classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function copyJSON() {
+  const text = document.getElementById('jsonPreview').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('📋 JSON copied to clipboard'));
+}
+
+// Close modal on overlay click
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+// ─────────────────────────────────────────────
+//  TOAST
+// ─────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+initTheme();
+initState();
+render();
+</script>
+</body>
+</html>
